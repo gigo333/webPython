@@ -101,6 +101,7 @@ while(1):
     else:
         request=s.split(" ")[1][1:].split("?")
         requestFile=request[0]
+        print(requestFile)
         if(len(request)>1):
             getRequest=request[1].split("&")
             reqestDict={}
@@ -110,7 +111,6 @@ while(1):
         
             print(reqestDict)
 
-        print(requestFile)
         if requestFile=="":
             toSend=handleHTML("index.html")
         elif requestFile=="favicon.ico":
@@ -124,7 +124,7 @@ while(1):
             if(not exists(requestFile)):
                 toSend=handleHTML("notFound.html")
             else:
-                format=requestFile.split(".")[1]
+                format=requestFile.split(".")[1].lower()
                 if(format=="html"):
                     toSend=handleHTML(requestFile)
                 elif(format=="pdf"):
