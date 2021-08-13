@@ -1,5 +1,5 @@
 document.getElementById("demo").innerHTML = "Hello World!";
-console.log("Hello world!");
+console.log("Connected!");
 var btn = document.getElementById("btn");
 var first=true;
 btn.addEventListener("click", onClick0);
@@ -26,7 +26,6 @@ function onClick0(){
                 }
             } else{
                 const div0 = document.getElementById("div0");
-                console.log(div0.children[4])
                 const divs=Array.from(div0.children);
                 var i=0;
                 for (const el in obj){
