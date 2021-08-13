@@ -36,25 +36,6 @@ def handleHTML(filename):
     with open(filename) as f:
         page=f.read()
 
-    js=page.find("<script src=")
-    while(js!=-1):
-        s=page[js+1:]
-        i=s.find("\"")
-        j=s.find("\'")
-        c="\""
-        if (i==-1 or (j!=-1 and j<i)):
-            c="\'"
-            i=j
-
-        s=s[i+1:]
-        i=s.find(c)
-        scriptName=s[:i]
-        #print(scriptName)
-        script=open(scriptName)
-        page=page.replace(" src="+c+scriptName+c+">"," language=\"javascript\">"+script.read())
-        script.close()
-        js=page.find("<script src=")
-
     toSend=htmlHeader+page
     return toSend.encode()
 
