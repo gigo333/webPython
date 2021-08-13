@@ -52,7 +52,7 @@ def handlePDF(fileName):
     return PDFHeader.encode()+document
 
 def handleDocument(fileName):
-    extension=sendFile.split(".")[1]
+    extension=requestFile.split(".")[1]
     header=documentHeader.replace("extesion", extension)
     with open(fileName, "rb") as f:
         document=f.read()
@@ -100,7 +100,7 @@ while(1):
         so.send(toSend.encode())
     else:
         request=s.split(" ")[1][1:].split("?")
-        sendFile=request[0]
+        requestFile=request[0]
         if(len(request)>1):
             getRequest=request[1].split("&")
             reqestDict={}
@@ -110,26 +110,29 @@ while(1):
         
             print(reqestDict)
 
-        print(sendFile)
-        if sendFile=="":
+        print(requestFile)
+        if requestFile=="":
             toSend=handleHTML("index.html")
-        elif sendFile=="favicon.ico":
+        elif requestFile=="favicon.ico":
             toSend=handleFavicon()
-        elif sendFile.find(".")==-1:
-            toSend=handleFolder(sendFile)
-        else:
-            if(not exists(sendFile)):
+        elif requestFile.find(".")==-1:
+            if(not exists(requestFile)):
                 toSend=handleHTML("notFound.html")
             else:
-                format=sendFile.split(".")[1]
+                toSend=handleFolder(requestFile)
+        else:
+            if(not exists(requestFile)):
+                toSend=handleHTML("notFound.html")
+            else:
+                format=requestFile.split(".")[1]
                 if(format=="html"):
-                    toSend=handleHTML(sendFile)
+                    toSend=handleHTML(requestFile)
                 elif(format=="pdf"):
-                    toSend=handlePDF(sendFile)
+                    toSend=handlePDF(requestFile)
                 elif(format in ["jpeg", "jpg", "png"]):
-                    toSend=handleImage(sendFile)
+                    toSend=handleImage(requestFile)
                 else:
-                    toSend=handleDocument(sendFile)
+                    toSend=handleDocument(requestFile)
 
         so.send(toSend)
         
