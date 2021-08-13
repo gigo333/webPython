@@ -118,7 +118,17 @@ while(1):
         toSend=jsonHeader+json.dumps(obj)
         so.send(toSend.encode())
     else:
-        sendFile=s.split(" ")[1][1:]
+        request=s.split(" ")[1][1:].split("?")
+        sendFile=request[0]
+        if(len(request)>1):
+            getRequest=request[1].split("&")
+            reqestDict={}
+            for req in getRequest:
+                req=req.split("=")
+                reqestDict[req[0]]=req[1]
+        
+            print(reqestDict)
+
         print(sendFile)
         if sendFile=="":
             toSend=handleHTML("index.html")
