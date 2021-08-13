@@ -16,13 +16,18 @@ Content-Type:application/json
 
 """
 
-imageHeader=arr="""HTTP/1.1 200 OK
+imageHeader="""HTTP/1.1 200 OK
 Content-Type:image
 
 """
 
-PDFHeader=arr="""HTTP/1.1 200 OK
+PDFHeader="""HTTP/1.1 200 OK
 Content-Type:application/pdf
+
+"""
+
+documentHeader="""HTTP/1.1 200 OK
+Content-Type:document/extension
 
 """
 
@@ -64,6 +69,14 @@ def handlePDF(fileName):
         document=f.read()
 
     return PDFHeader.encode()+document
+
+def handleDocument(fileName):
+    extension=sendFile.split(".")[1]
+    header=documentHeader.replace("extesion", extension)
+    with open(fileName, "rb") as f:
+        document=f.read()
+
+    return header.encode()+document
 
 def handleFolder(folderName):
     fileRef="""<p><a href="link">fileName</a></p>\n"""
@@ -122,8 +135,10 @@ while(1):
                     toSend=handleHTML(sendFile)
                 elif(format=="pdf"):
                     toSend=handlePDF(sendFile)
-                else:
+                elif(format in ["jpeg", "jpg", "png"]):
                     toSend=handleImage(sendFile)
+                else:
+                    toSend=handleDocument(sendFile)
 
         so.send(toSend)
         
