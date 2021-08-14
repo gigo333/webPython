@@ -64,7 +64,6 @@ def handleFolder(folderName):
     files=""
     for fileName in listdir(folderName):
         link=folderName.split("/")[-1]+"/"+fileName
-        print(link)
         s=fileRef.replace("link",link)
         s=s.replace("fileName", fileName)
         files+=s
