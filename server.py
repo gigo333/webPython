@@ -99,7 +99,7 @@ while(1):
         obj["Success"]=True
         toSend=jsonHeader+json.dumps(obj)
         so.send(toSend.encode())
-    else:
+    elif(s[0:3]=="GET"):
         request=s.split(" ")[1][1:].split("?")
         requestFile=request[0]
         print(requestFile)
@@ -136,5 +136,7 @@ while(1):
                     toSend=handleDocument(requestFile)
 
         so.send(toSend)
+    else:
+        print(s)
         
     so.close()
