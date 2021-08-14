@@ -77,7 +77,7 @@ def handleFolder(folderName):
     return s.encode()
 
 def handleFavicon():
-    with open("oldFiles/img.jpg", "rb") as f:
+    with open("oldFiles/images/img.jpg", "rb") as f:
         img=f.read()
 
     return imageHeader.encode()+img
