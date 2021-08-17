@@ -18,14 +18,26 @@ def formatWSText(text):
         opcode=1
         buffer[0]=128+opcode
         buffer[1]=length
-    else: 
+    elif(length<2**16-1): 
         buffer=bytearray(4)
         opcode=1
         buffer[0]=128+opcode
         buffer[1]=126
         buffer[2]=length//256
         buffer[3]=length%256
-
+    else:
+        buffer=bytearray(6)
+        opcode=1
+        buffer[0]=128+opcode
+        buffer[1]=127
+        buffer[5]=length%256
+        length=length//256
+        buffer[4]=length%256
+        length=length//256
+        buffer[3]=length%256
+        length=length//256
+        buffer[2]=length
+        buffer=bytearray(6)
     return bytes(buffer)+decoded
 
 def receiveWSText(so):
@@ -40,6 +52,9 @@ def receiveWSText(so):
     if length==126:
         buffer=recvAll(so, 2)
         length=buffer[1]*256+buffer[0]
+    elif(length==127):
+        buffer=recvAll(so, 4)
+        length=buffer[3]*(256**3)+buffer[2]*(256**2)+buffer[1]*256+buffer[0]
 
     buffer=recvAll(so, 4+length)
     mask=buffer[:4]
