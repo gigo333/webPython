@@ -22,19 +22,22 @@ def formatWSText(text):
 
     return bytes(buffer)+decoded
 
-def decodeWSText(buffer):
+def receiveWSText(so):
+    buffer=so.recv(2)
+    print(bin(buffer[0]))
+    print(bin(buffer[1]))
     opcode=buffer[0] & 15
     if(opcode!=1):
         return None
 
     length=buffer[1]%128
-    k=2
     if length==126:
-        k=4
-        length=buffer[2]*256+buffer[3]
+        buffer=so.recv(2)
+        length=buffer[1]*256+buffer[0]
 
-    mask=buffer[k:k+4]
-    encoded=buffer[k+4:]
+    buffer=so.recv(4+length)
+    mask=buffer[:4]
+    encoded=buffer[4:]
     decoded=bytearray(length)
     for i in range(length):
         decoded[i]=encoded[i]^mask[i%4]
@@ -64,16 +67,14 @@ while(1):
         toSend=wsAcceptHeader.replace("AcceptCode", AcceptCode).encode()
         so.send(toSend)
         while(1):
-            buffer=so.recv(1000)
-            print(bin(buffer[0]))
-            print(bin(buffer[1]))
-            message=decodeWSText(buffer)
+            message=receiveWSText(so)
             if(message!=None):
                 print(message)
                 toSend={"Temperature":31.5, "Humidity":50}
                 buffer=formatWSText(json.dumps(toSend))
                 so.send(buffer)
 
-    except:    
+    except: 
+        print("Disconnected!")   
         so.close()
     

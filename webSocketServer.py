@@ -2,6 +2,13 @@ import hashlib
 import base64
 import json
 
+def recvAll(so, l):
+    b=b''
+    while(len(b)<l):
+        b+=so.recv(l-len(b))
+
+    return b
+
 def formatWSText(text):
     decoded=text.encode()
     length=len(text)
@@ -21,19 +28,22 @@ def formatWSText(text):
 
     return bytes(buffer)+decoded
 
-def decodeWSText(buffer):
+def receiveWSText(so):
+    buffer=recvAll(so, 2)
+    print("##############")
+    print("WS: "+bin(buffer[0])+"\t"+bin(buffer[1]))
     opcode=buffer[0] & 15
     if(opcode!=1):
         return None
 
     length=buffer[1]%128
-    k=2
     if length==126:
-        k=4
-        length=buffer[2]*256+buffer[3]
+        buffer=recvAll(so, 2)
+        length=buffer[1]*256+buffer[0]
 
-    mask=buffer[k:k+4]
-    encoded=buffer[k+4:]
+    buffer=recvAll(so, 4+length)
+    mask=buffer[:4]
+    encoded=buffer[4:]
     decoded=bytearray(length)
     for i in range(length):
         decoded[i]=encoded[i]^mask[i%4]
@@ -56,10 +66,7 @@ def handleWS(so, s, code):
     so.send(toSend)    
     while(1):
         try:
-            buffer=so.recv(1000)
-            print("##############")
-            print("WS: "+bin(buffer[0])+"\t"+bin(buffer[1]))
-            message=decodeWSText(buffer)
+            message=receiveWSText(so)
             if(message!=None):
                 print("WS: "+message)
                 toSend={"Temperature":31.5, "Humidity":50}
