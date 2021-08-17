@@ -1,0 +1,66 @@
+<!DOCTYPE HTML>
+
+<html>
+   <head>
+      
+      <script type = "text/javascript">
+         var ws = null;
+         var currentHost = window.location.host;
+         if (currentHost===null || currentHost===""){
+            currentHost="192.168.0.120"
+         }
+         console.log(currentHost);
+         function WebSocketTest() {
+            
+            if ("WebSocket" in window) {
+               alert("WebSocket is supported by your Browser!");
+               
+               // Let us open a web socket
+               ws = new WebSocket("ws://"+currentHost);
+				
+               ws.onopen = function() {
+                  
+                  // Web Socket is connected, send data using send()
+                  ws.send("Message to send");
+                  alert("Message is sent...");
+               };
+				
+               ws.onmessage = function (evt) { 
+                  var received_msg = evt.data;
+                  alert("Message is received...\n");
+                  var obj=JSON.parse(received_msg);
+                  console.log(obj)
+               };
+				
+               ws.onclose = function() { 
+                  
+                  // websocket is closed.
+                  alert("Connection is closed..."); 
+               };
+            } else {
+              
+               // The browser doesn't support WebSocket
+               alert("WebSocket NOT supported by your Browser!");
+            }
+         }
+         function sendMessage(){
+            if(ws!=null){
+               ws.send("Message");
+               console.log("Message sent")
+            } else {
+               console.log("Message not\ sent");
+            }
+         }
+      </script>
+   </head>
+
+   <body>
+      <div id = "sse">
+         <a href = "javascript:WebSocketTest()">Run WebSocket</a>
+         <!-- <a href = "javascript:sendMessage()">Send Message</a> -->
+         <br>
+         <button onclick="javascript:sendMessage()">Send Message</button>
+      </div>
+      
+   </body>
+</html>
