@@ -1,6 +1,8 @@
 import socket
+from threading import Thread
 
 from httpServer import handleHTTP
+from webSocketServer import handleWS
 
 ADDRESS="192.168.0.120"
 PORT=80
@@ -15,8 +17,18 @@ while(1):
     print(addr[0])
     r=so.recv(1000)
     s=r.decode()
-    toSend=handleHTTP(s)
-    if toSend!=None:
-        so.send(toSend)
-    
-    so.close()
+    st=s.split("\r")
+    code=''
+    for head in st:
+        if "Sec-WebSocket-Key:" in head:
+            code=head.split(" ")[1]
+            break
+
+    if(code==''):
+        th = Thread(target= handleHTTP, args=(so,s))
+        th.setDaemon(True)
+        th.start()
+    else:
+        th = Thread(target=handleWS, args=(so, s, code))
+        th.setDaemon(True)
+        th.start()

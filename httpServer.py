@@ -78,14 +78,14 @@ def handleFavicon():
 
     return imageHeader.encode()+img
 
-def handleHTTP(s):
+def handleHTTP(so, s):
     if s[0:4]=="POST":
         st=s.split('\r')[-1]
         obj=json.loads(st)
         print(obj)
         obj["Success"]=True
         toSend=jsonHeader+json.dumps(obj)
-        return toSend.encode()
+        so.send(toSend.encode())
     elif(s[0:3]=="GET"):
         request=s.split(" ")[1][1:].split("?")
         requestFile=request[0]
@@ -122,7 +122,8 @@ def handleHTTP(s):
                 else:
                     toSend=handleDocument(requestFile)
 
-        return toSend
+        so.send(toSend)
     else:
         print(s)
-        return None
+        
+    so.close()
