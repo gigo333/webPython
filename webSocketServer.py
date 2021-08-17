@@ -41,7 +41,7 @@ def formatWSText(text):
     return bytes(buffer)+decoded
 
 def receiveWSText(so):
-    buffer=recvAll(so, 2)
+    buffer=so.recv(2)
     print("##############")
     print("WS: "+bin(buffer[0])+"\t"+bin(buffer[1]))
     opcode=buffer[0] & 15

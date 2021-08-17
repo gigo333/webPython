@@ -25,7 +25,7 @@ while(1):
             break
 
     if(code==''):
-        th = Thread(target= handleHTTP, args=(so,s))
+        th = Thread(target=handleHTTP, args=(so, s))
         th.setDaemon(True)
         th.start()
     else:
