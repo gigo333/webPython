@@ -6,7 +6,6 @@ import json
 def formatWSText(text):
     decoded=text.encode()
     length=len(text)
-    print(length)
     buffer=None
     if(length<126):
         buffer=bytearray(2)
@@ -55,7 +54,6 @@ while(1):
     so, addr = sc.accept()
     try:
         s=so.recv(1000).decode().split("\r")
-        print(s)
         for st in s:
             if "Sec-WebSocket-Key:" in st:
                 s=st.split(" ")[1]
