@@ -65,7 +65,6 @@ def handleWS(so, s, code):
     request=s.split(" ")[1][1:].split("?")
     requestPath=request[0]
     print(requestPath)
-    print(code)
     code=code+"258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
     AcceptCode=base64.b64encode(hashlib.sha1(code.encode()).digest()).decode()
     toSend=wsAcceptHeader.replace("AcceptCode", AcceptCode).encode()
