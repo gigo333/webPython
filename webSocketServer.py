@@ -9,18 +9,15 @@ def recvAll(so, l):
 
     return b
 
-def formatWSText(text):
-    decoded=text.encode()
-    length=len(text)
+def formatWS(toSend, opcode):
+    length=len(toSend)
     buffer=None
     if(length<126):
         buffer=bytearray(2)
-        opcode=1
         buffer[0]=128+opcode
         buffer[1]=length
     elif(length<2**16-1): 
         buffer=bytearray(4)
-        opcode=1
         buffer[0]=128+opcode
         buffer[1]=126
         buffer[2]=length//256
@@ -38,17 +35,11 @@ def formatWSText(text):
         length=length//256
         buffer[2]=length
         buffer=bytearray(6)
-    return bytes(buffer)+decoded
+    return bytes(buffer)+toSend
 
-def receiveWSText(so):
-    buffer=so.recv(2)
-    print("##############")
-    print("WS: "+bin(buffer[0])+"\t"+bin(buffer[1]))
-    opcode=buffer[0] & 15
-    if(opcode!=1):
-        return None
-
-    length=buffer[1]%128
+def receiveWS(so):
+    buffer=so.recv(1)
+    length=buffer[0]%128
     if length==126:
         buffer=recvAll(so, 2)
         length=buffer[1]*256+buffer[0]
@@ -63,7 +54,7 @@ def receiveWSText(so):
     for i in range(length):
         decoded[i]=encoded[i]^mask[i%4]
 
-    return decoded.decode()
+    return decoded
 
 wsAcceptHeader="""HTTP/1.1 101 Switching Protocols\r
 Upgrade: websocket\r
@@ -81,13 +72,20 @@ def handleWS(so, s, code):
     so.send(toSend)    
     while(1):
         try:
-            message=receiveWSText(so)
-            if(message!=None):
+            buffer=so.recv(1)
+            opcode=buffer[0] & 15
+            buffer=receiveWS(so)
+            if(opcode==1):
+                message=buffer.decode()
+                print("##############")
                 print("WS: "+message)
-                toSend={"Temperature":31.5, "Humidity":50}
-                buffer=formatWSText(json.dumps(toSend))
+                obj={"Temperature":31.5, "Humidity":50}
+                toSend=json.dumps(obj).encode()
+                opcode=1
+                buffer=formatWS(toSend, opcode)
                 so.send(buffer)
         except:
+            print("##############")
             print("WS: Disconnected!")
             so.close()
             break
