@@ -60,15 +60,22 @@ Sec-WebSocket-Accept: AcceptCode\r
 \r\n"""
 
 def sendThread(so):
+    import cv2
+    cap=cv2.VideoCapture(0)
     while(1):
         try:
-            t=input("\nTemperature?\n")
-            t=t.replace(",",".")
-            obj={"Temperature":float(t), "Humidity":50}
-            toSend=json.dumps(obj).encode()
-            buffer=formatWS(toSend)
-            so.send(buffer)
+            _ ,im = cap.read()
+            im_flip=cv2.flip(im,1)
+            im_resize = cv2.resize(im_flip, (500, 500))
+        
+            is_success, im_buf_arr = cv2.imencode(".jpg", im_resize)
+            if(is_success):
+                byte_im = im_buf_arr.tobytes()
+                buffer=formatWS(byte_im,"Binary")
+                so.send(buffer)
+
         except:
+            cap.release()
             break
 
 def handleWS(so, s, code):
@@ -84,7 +91,11 @@ def handleWS(so, s, code):
         print(len(buffer))
         b=formatWS(buffer, "Binary")
         so.sendall(b)
-        
+
+    obj={"Temperature":28.5, "Humidity":50}
+    toSend=json.dumps(obj).encode()
+    buffer=formatWS(toSend)
+    so.send(buffer)
     th = Thread(target=sendThread, args=(so,))
     th.setDaemon(True)
     th.start()    
