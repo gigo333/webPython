@@ -17,7 +17,7 @@
                
                // Let us open a web socket
                ws = new WebSocket("ws://"+currentHost);
-				
+               ws.binaryType = "arraybuffer";
                ws.onopen = function() {
                   
                   // Web Socket is connected, send data using send()
@@ -27,11 +27,21 @@
 				
                ws.onmessage = function (evt) { 
                   var received_msg = evt.data;
-                  alert("Message is received...\n");
-                  var obj=JSON.parse(received_msg);
-                  console.log(obj)
+                  if(typeof(received_msg)==="string"){
+                     //alert("Message is received...\n");
+                     var obj=JSON.parse(received_msg);
+                     console.log(obj);
+                     document.getElementById("Temperature").innerHTML=obj.Temperature;
+                  } else if (received_msg instanceof ArrayBuffer){
+                     console.log(received_msg.byteLength);
+                     var blob = new Blob( [ received_msg ], { type: "image/jpeg" } );
+                     var imageUrl = URL.createObjectURL( blob );
+                     document.getElementById("img0").src=imageUrl
+                  } else {
+                     console.log(received_msg);
+                  }
                };
-				
+
                ws.onclose = function() { 
                   
                   // websocket is closed.
@@ -60,6 +70,8 @@
          <!-- <a href = "javascript:sendMessage()">Send Message</a> -->
          <br>
          <button onclick="javascript:sendMessage()">Send Message</button>
+         <p>Temperature: <div id="Temperature"></div></p>
+         <img id="img0">
       </div>
       
    </body>
