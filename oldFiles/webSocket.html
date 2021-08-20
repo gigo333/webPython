@@ -4,6 +4,7 @@
    <head>
       
       <script type = "text/javascript">
+
          var ws = null;
          var currentHost = window.location.host;
          if (currentHost===null || currentHost===""){
@@ -14,7 +15,7 @@
             
             if ("WebSocket" in window) {
                alert("WebSocket is supported by your Browser!");
-               
+               var first=true;
                // Let us open a web socket
                ws = new WebSocket("ws://"+currentHost);
                ws.binaryType = "arraybuffer";
@@ -38,6 +39,28 @@
                         var blob = new Blob( [ received_msg ], { type: "image/jpeg" } );
                         var imageUrl = URL.createObjectURL( blob );
                         document.getElementById("img0").src=imageUrl
+                        if(first){
+                           first=false
+                           document.getElementById("img0").addEventListener('click', function (event) {
+                              // https://stackoverflow.com/a/288731/1497139
+                              bounds=this.getBoundingClientRect();
+                              var left=bounds.left;
+                              var top=bounds.top;
+                              var x = event.pageX - left;
+                              var y = event.pageY - top;
+                              var cw=this.clientWidth
+                              var ch=this.clientHeight
+                              var iw=this.naturalWidth
+                              var ih=this.naturalHeight
+                              var px=Math.floor(x/cw*iw)
+                              var py=Math.floor(y/ch*ih)
+                              if(iw!==0 && ih!==0){
+                                 obj={px, py, iw, ih}
+                                 //console.log("click on "+this.tagName+" at pixel ("+px+","+py+") mouse pos ("+x+"," + y+ ") relative to boundingClientRect at ("+left+","+top+") client image size: "+cw+" x "+ch+" natural image size: "+iw+" x "+ih );
+                                 ws.send(JSON.stringify(obj))
+                              }
+                           });
+                        }
                      }
                   } else {
                      console.log(received_msg);

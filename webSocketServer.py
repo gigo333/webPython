@@ -86,11 +86,11 @@ def handleWS(so, s, code):
     AcceptCode=base64.b64encode(hashlib.sha1(code.encode()).digest()).decode()
     toSend=wsAcceptHeader.replace("AcceptCode", AcceptCode).encode()
     so.send(toSend)
-    with open("oldFIles/images/img.jpg", "rb") as f:
+    """with open("oldFIles/images/img.jpg", "rb") as f:
         buffer=f.read()
         print(len(buffer))
         b=formatWS(buffer, "Binary")
-        so.sendall(b)
+        so.sendall(b)"""
 
     obj={"Temperature":28.5, "Humidity":50}
     toSend=json.dumps(obj).encode()
