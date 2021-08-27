@@ -17,7 +17,7 @@
                alert("WebSocket is supported by your Browser!");
                var first=true;
                // Let us open a web socket
-               ws = new WebSocket("ws://"+currentHost);
+               ws = new WebSocket("ws://"+currentHost+"/thermalImg");
                ws.binaryType = "arraybuffer";
                ws.onopen = function() {
                   
@@ -31,9 +31,12 @@
                   if(typeof(received_msg)==="string"){
                      //alert("Message is received...\n");
                      var obj=JSON.parse(received_msg);
-                     console.log(obj);
                      id="Temperature";
-                     document.getElementById(id).innerHTML=id+": "+obj.Temperature;
+                     if(id in obj){
+                        document.getElementById(id).innerHTML=id+" range in C: "+obj.Temperature.min+" , "+obj.Temperature.max;  
+                     } else {
+                        console.log(obj);
+                     }
                   } else if (received_msg instanceof ArrayBuffer){
                      if(received_msg.byteLength>0){
                         var blob = new Blob( [ received_msg ], { type: "image/jpeg" } );

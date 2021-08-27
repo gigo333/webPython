@@ -3,6 +3,7 @@ import base64
 import json
 from threading import Thread
 from struct import pack, unpack
+from time import sleep
 
 def recvAll(so, l):
     b=b''
@@ -59,46 +60,26 @@ Connection: Upgrade\r
 Sec-WebSocket-Accept: AcceptCode\r
 \r\n"""
 
-def sendThread(so):
-    import cv2
-    cap=cv2.VideoCapture(0)
+def sendThermal(so, args):
     while(1):
         try:
-            _ ,im = cap.read()
-            im_flip=cv2.flip(im,1)
-            im_resize = cv2.resize(im_flip, (500, 500))
-        
-            is_success, im_buf_arr = cv2.imencode(".jpg", im_resize)
-            if(is_success):
-                byte_im = im_buf_arr.tobytes()
-                buffer=formatWS(byte_im,"Binary")
+            thermalImg=args[0]
+            img=thermalImg.getImg()
+            imgBuff=img[0]
+            mintemp=img[1]
+            maxtemp=img[2]
+            if(len(imgBuff)>0):
+                buffer=formatWS(imgBuff, "Binary")
                 so.send(buffer)
-
+                obj={"Temperature":{"min":int(mintemp), "max":int(maxtemp)}}
+                toSend=json.dumps(obj).encode()
+                toSend=formatWS(toSend)
+                so.send(toSend)
+                sleep(0.05)
         except:
-            cap.release()
             break
 
-def handleWS(so, s, code):
-    request=s.split(" ")[1][1:].split("?")
-    requestPath=request[0]
-    print(requestPath)
-    code=code+"258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
-    AcceptCode=base64.b64encode(hashlib.sha1(code.encode()).digest()).decode()
-    toSend=wsAcceptHeader.replace("AcceptCode", AcceptCode).encode()
-    so.send(toSend)
-    """with open("oldFIles/images/img.jpg", "rb") as f:
-        buffer=f.read()
-        print(len(buffer))
-        b=formatWS(buffer, "Binary")
-        so.sendall(b)"""
-
-    obj={"Temperature":28.5, "Humidity":50}
-    toSend=json.dumps(obj).encode()
-    buffer=formatWS(toSend)
-    so.send(buffer)
-    th = Thread(target=sendThread, args=(so,))
-    th.setDaemon(True)
-    th.start()    
+def recvThread(so, args):
     while(1):
         try:
             buffer=so.recv(1)
@@ -114,3 +95,27 @@ def handleWS(so, s, code):
             print("WS: Disconnected!")
             so.close()
             break
+
+def handleWS(so, s, code, thermalImg):
+    request=s.split(" ")[1][1:].split("?")
+    requestPath=request[0]
+    print(requestPath)
+    code=code+"258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
+    AcceptCode=base64.b64encode(hashlib.sha1(code.encode()).digest()).decode()
+    toSend=wsAcceptHeader.replace("AcceptCode", AcceptCode).encode()
+    so.send(toSend)
+    args=None
+    sendHandler=None
+    recvHandler=None
+    if(requestPath=="thermalImg"):
+        args=[thermalImg]
+        sendHandler=sendThermal
+        recvHandler=recvThread
+
+    if(sendHandler!=None):
+        th = Thread(target=sendHandler, args=(so, args))
+        th.setDaemon(True)
+        th.start()
+    
+    if(recvHandler!=None):
+        recvHandler(so,args)
