@@ -21,7 +21,7 @@
                ws = new WebSocket("ws://"+currentHost+"/thermalImg");
                ws.binaryType = "arraybuffer";
                ws.onopen = function() {
-                  
+                  document.getElementById("Buttons").style.display="block"
                   // Web Socket is connected, send data using send()
                   ws.send("Message to send");
                   alert("Message is sent...");
@@ -92,19 +92,29 @@
             }
          }*/
          function takePicture(){
-            window.open(url);
+            document.getElementById("img1").src=url
+            document.getElementById("btn1").href=url
          }
       </script>
    </head>
-
+   <style>
+      .content {
+        max-width: 500px;
+        margin: auto;
+        align-content: center;
+      }
+      </style>
    <body>
       <div id = "sse">
          <a href = "javascript:WebSocketTest()">Run WebSocket</a>
          <!-- <a href = "javascript:sendMessage()">Send Message</a> -->
          <br>
-         <button onclick="javascript:takePicture()">Take Picture</button>
+         <div style = "display:none" id="Buttons">
+            <button onclick="javascript:takePicture()">Take Picture</button>
+            <a id="btn1" download="image.jpeg"><button type="button">Save Picture</button></a>
+         </div>
          <p id="Temperature"></p>
-         <img id="img0">
+         <img id="img0"> <img id="img1">
       </div>
       
    </body>
