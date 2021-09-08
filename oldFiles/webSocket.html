@@ -2,7 +2,7 @@
 
 <html>
    <head>
-      
+      <script src='https://cdn.plot.ly/plotly-2.4.2.min.js'></script>
       <script type = "text/javascript">
 
          var ws = null;
@@ -10,6 +10,9 @@
          var currentHost = window.location.host;
          if (currentHost===null || currentHost===""){
             currentHost="192.168.0.120"
+         }
+         function plot(){
+            
          }
          console.log(currentHost);
          function WebSocketTest() {
@@ -25,6 +28,26 @@
                   // Web Socket is connected, send data using send()
                   ws.send("Message to send");
                   alert("Message is sent...");
+                  var trace1 = {
+                     x: [],
+                     y: [],
+                     type: 'scatter',
+                     mode: 'lines'
+                  };
+                  var trace2 = {
+                     x: [],
+                     y: [],
+                     type: 'scatter',
+                     mode: 'lines'
+                  };
+
+                  var data = [trace1, trace2];
+
+                  var layout = {
+                     title: 'Tmax & Tmin',
+                     showlegend: false
+                  };
+                  Plotly.newPlot('myDiv', data, layout, {scrollZoom: true});
                };
 				
                ws.onmessage = function (evt) { 
@@ -34,7 +57,13 @@
                      var obj=JSON.parse(received_msg);
                      id="Temperature";
                      if(id in obj){
-                        document.getElementById(id).innerHTML=id+" range in C: "+obj.Temperature.min+" , "+obj.Temperature.max;  
+                        document.getElementById(id).innerHTML=id+" range in C: "+obj.Temperature.min+" , "+obj.Temperature.max;
+                        var time = new Date();
+                        Plotly.extendTraces('myDiv', {
+                           x:  [[time],[time]],
+                           y: [[obj.Temperature.max],[obj.Temperature.min]]
+                        }, [0,1])
+  
                      } else {
                         console.log(obj);
                      }
@@ -104,7 +133,7 @@
         align-content: center;
       }
       </style>
-   <body>
+   <body onload="plot()">
       <div id = "sse">
          <a href = "javascript:WebSocketTest()">Run WebSocket</a>
          <!-- <a href = "javascript:sendMessage()">Send Message</a> -->
@@ -116,6 +145,6 @@
          <p id="Temperature"></p>
          <img id="img0"> <img id="img1">
       </div>
-      
+      <div id='myDiv'></div>
    </body>
 </html>
