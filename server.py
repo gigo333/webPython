@@ -10,7 +10,7 @@ PORT=80
 
 thermalImg=ThremalImg()
 
-address=address=socket.gethostbyname(socket.gethostname())
+address=socket.gethostbyname(socket.gethostname())
 sc=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 sc.bind((address,PORT))
