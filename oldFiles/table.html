@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script>
+        var num=1;
+        function addrow(){
+            num++;
+            var x = document.getElementById("add");
+            x.innerHTML= x.innerHTML +"<tr><td>Content_"+num+"</td><td>"+"Hi"+"</td></tr>";
+        }
+        </script>
+        <title>Add new row with js</title>
+    </head>
+    <body>
+        <style type="text/css">
+            table.table-style-two {
+                font-family: verdana, arial, sans-serif;
+                font-size: 11px;
+                color: #333333;
+                border-width: 1px;
+                border-color: #3A3A3A;
+                border-collapse: collapse;
+            }
+         
+            table.table-style-two th {
+                border-width: 1px;
+                padding: 8px;
+                border-style: solid;
+                border-color: #517994;
+                background-color: #B2CFD8;
+            }
+         
+            table.table-style-two tr:hover td {
+                background-color: #DFEBF1;
+            }
+         
+            table.table-style-two td {
+                border-width: 1px;
+                padding: 8px;
+                border-style: solid;
+                border-color: #517994;
+                background-color: #ffffff;
+                text-align: center;
+            }
+        </style>
+        <table id="add" class="table-style-two">
+        <thead><th>Content_ID</th><th>Meassage</th><td><button onclick="addrow()">+</button></td></thead>
+        <tr><td>Content_1</td><td>Hi</td></tr>
+        </table>
+    </body>
+</html>

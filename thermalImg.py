@@ -21,7 +21,7 @@ MAXTEMP = 32
 #how many color values we can have
 COLORDEPTH = 1024*8
 
-ADDRESS="192.168.0.114"
+ADDRESS="192.168.0.109"
 PORT=1234
 
 #some utility functions
@@ -87,7 +87,7 @@ class ThremalImg():
             try:
                 #read the pixels
                 buffer=recvall(so, 256)
-                pixels=np.array(unpack("!64f", buffer))
+                pixels=np.array(unpack("<64f", buffer))
                 maxtemp=pixels.max()
                 mintemp=pixels.min()
                 pixels = [map(p,mintemp, maxtemp, 0, COLORDEPTH - 1) for p in pixels]
