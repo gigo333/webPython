@@ -6,14 +6,20 @@ from webSocketServer import handleWS
 
 from thermalImg import ThremalImg
 
-ADDRESS="192.168.0.120"
 PORT=80
 
 thermalImg=ThremalImg()
 
+address=address=socket.gethostbyname(socket.gethostname())
 sc=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-sc.bind((ADDRESS,PORT))
+sc.bind((address,PORT))
+print("##############")
+if(PORT==80):
+    print("Server running at:\nhttp://"+address)
+else:
+    print("Server running at:\nhttp://"+address+":"+str(PORT))
+
 thread = Thread(target=thermalImg.run)
 thread.setDaemon(True)
 thread.start()
@@ -21,6 +27,7 @@ thread.start()
 while(1):
     sc.listen(1)
     so, addr = sc.accept()
+    
     print("##############")
     print(addr[0])
     r=so.recv(1000)
@@ -40,3 +47,4 @@ while(1):
         th = Thread(target=handleWS, args=(so, s, code, thermalImg))
         th.setDaemon(True)
         th.start()
+
